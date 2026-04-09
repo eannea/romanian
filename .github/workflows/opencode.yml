@@ -40,4 +40,44 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
-          opencode run "Perform a daily minimalist improvement (it is a must, whatever it is). Add minimalist code, create a new file, or fix one specific bug, typo, or small logic flaw in a single file. If you don't know what to do, no need to ask me, just know that there must be edit to a file (either existing or creating a new one is needed). Avoid large refactors or full-file rewrites. Keep changes minimal to save tokens. Don't change github workflow files. After the edit, execute git add, git commit with relevant commit name, and git push"
+          HEAD_BEFORE=$(git rev-parse HEAD)
+          COMMITTED=false
+
+          # --- Attempt 1: standard prompt ---
+          opencode run "Perform a daily minimalist improvement (it is a must, whatever it is). Add minimalist code, create a new file, or fix one specific bug, typo, or small logic flaw in a single file. If you don't know what to do, no need to ask me, just know that there must be an edit to a file (either existing or creating a new one is needed). Avoid large refactors or full-file rewrites. Keep changes minimal to save tokens. Don't change github workflow files. After the edit, execute git add, git commit with a relevant commit message, and git push." || true
+
+          # Commit any uncommitted changes left behind
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: apply daily improvement (auto-committed)"
+          fi
+
+          if [ "$(git rev-parse HEAD)" != "$HEAD_BEFORE" ]; then
+            COMMITTED=true
+          fi
+
+          # --- Attempt 2: laser-focused prompt ---
+          if [ "$COMMITTED" = "false" ]; then
+            TODAY=$(date -u +%Y-%m-%d)
+            opencode run "You must create a new file at notes/${TODAY}.md containing exactly one interesting sentence about the Romanian language or culture. Then run: git add notes/${TODAY}.md && git commit -m 'notes: daily entry ${TODAY}' && git push." || true
+
+            # Commit any uncommitted changes left behind
+            if [ -n "$(git status --porcelain)" ]; then
+              git add -A
+              git commit -m "chore: apply daily improvement (auto-committed, attempt 2)"
+            fi
+
+            if [ "$(git rev-parse HEAD)" != "$HEAD_BEFORE" ]; then
+              COMMITTED=true
+            fi
+          fi
+
+          # --- Fallback: guaranteed commit via plain git ---
+          if [ "$COMMITTED" = "false" ]; then
+            TODAY=$(date -u +%Y-%m-%d)
+            mkdir -p notes
+            echo "Daily automated entry for ${TODAY}." > notes/${TODAY}.md
+            git add notes/${TODAY}.md
+            git commit -m "notes: daily entry ${TODAY} (fallback)"
+            git push
+          fi
