@@ -28,7 +28,7 @@ jobs:
           mkdir -p ~/.config/opencode
           echo "{
             \"\$schema\": \"https://opencode.ai/config.json\",
-            \"model\": \"openrouter/free\"
+            \"model\": \"openrouter/openrouter/free\"
           }" > ~/.config/opencode/opencode.json
 
       - name: Set Git Identity (Actor Profile)
