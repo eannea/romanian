@@ -28,15 +28,8 @@ jobs:
           mkdir -p ~/.config/opencode
           echo "{
             \"\$schema\": \"https://opencode.ai/config.json\",
-            \"provider\": {
-              \"openrouter\": {
-                \"apiKey\": \"$OPENROUTER_API_KEY\"
-              }
-            },
             \"model\": \"openrouter/free\"
           }" > ~/.config/opencode/opencode.json
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
       - name: Set Git Identity (Actor Profile)
         run: |
