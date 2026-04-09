@@ -79,5 +79,9 @@ jobs:
             echo "Daily automated entry for ${TODAY}." > notes/${TODAY}.md
             git add notes/${TODAY}.md
             git commit -m "notes: daily entry ${TODAY} (fallback)"
+          fi
+
+          # Push any commits (covers model commits that were never pushed, and fallback commits)
+          if [ "$(git rev-parse HEAD)" != "$HEAD_BEFORE" ]; then
             git push
           fi
