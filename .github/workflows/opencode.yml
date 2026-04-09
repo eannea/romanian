@@ -44,7 +44,7 @@ jobs:
           COMMITTED=false
 
           # --- Attempt 1: standard prompt ---
-          opencode run "Perform a daily minimalist improvement (it is a must, whatever it is). Add minimalist code, create a new file, or fix one specific bug, typo, or small logic flaw in a single file. If you don't know what to do, no need to ask me, just know that there must be an edit to a file (either existing or creating a new one is needed). Avoid large refactors or full-file rewrites. Keep changes minimal to save tokens. Don't change github workflow files. After the edit, execute git add, git commit with a relevant commit message, and git push." || true
+          timeout 10m opencode run "Perform a daily minimalist improvement (it is a must, whatever it is). Add minimalist code, create a new file, or fix one specific bug, typo, or small logic flaw in a single file. If you don't know what to do, no need to ask me, just know that there must be an edit to a file (either existing or creating a new one is needed). Avoid large refactors or full-file rewrites. Keep changes minimal to save tokens. Don't change github workflow files. After the edit, execute git add, git commit with a relevant commit message, and git push." || true
 
           # Commit any uncommitted changes left behind
           if [ -n "$(git status --porcelain)" ]; then
@@ -59,7 +59,7 @@ jobs:
           # --- Attempt 2: laser-focused prompt ---
           if [ "$COMMITTED" = "false" ]; then
             TODAY=$(date -u +%Y-%m-%d)
-            opencode run "You must create a new file at notes/${TODAY}.md containing exactly one interesting sentence about the Romanian language or culture. Then run: git add notes/${TODAY}.md && git commit -m 'notes: daily entry ${TODAY}' && git push." || true
+            timeout 10m opencode run "You must create a new file at notes/${TODAY}.md containing exactly one interesting sentence about the Romanian language or culture. Then run: git add notes/${TODAY}.md && git commit -m 'notes: daily entry ${TODAY}' && git push." || true
 
             # Commit any uncommitted changes left behind
             if [ -n "$(git status --porcelain)" ]; then
